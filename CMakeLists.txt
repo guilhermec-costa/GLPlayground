@@ -9,7 +9,15 @@ include_directories(include)
 
 find_package(OpenGL REQUIRED)
 
-add_subdirectory(external/glfw)
+include(FetchContent)
+
+FetchContent_Declare(
+  glfw
+  GIT_REPOSITORY https://github.com/glfw/glfw.git
+  GIT_TAG 3.4
+)
+
+FetchContent_MakeAvailable(glfw)
 
 add_executable(${PROJECT_NAME}
   src/glad.c
