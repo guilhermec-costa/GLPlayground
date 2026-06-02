@@ -48,16 +48,16 @@ const unsigned int WINDOW_HEIGHT = 600;
         interprets vertices using the primitive type from the draw call.
     ↓
 
+    Clipping:
+      discards portions of primitives outside the viewing volume.
+    ↓
+
     Rasterization:
       converts primitives into fragments.
 
       Determines which screen samples/pixels are covered by the primitive.
 
       Outputs fragments (not pixels yet).
-    ↓
-
-    Clipping:
-      discards portions of primitives outside the viewing volume.
     ↓
 
 
@@ -73,11 +73,24 @@ const unsigned int WINDOW_HEIGHT = 600;
       (usually color, optionally depth/discard).
     ↓
 
-    Per-fragment operations:
-      depth testing
-      stencil testing
-      blending
-      etc.
+     Tests and Blending (Per-fragment operations):
+      Alpha Test / Discard:
+        decides whether a fragment should exist,
+        usually based on its alpha value (transparency threshold)
+
+      Depth Testing:
+        decides whether a fragment is visible,
+        based on its depth compared to previously rendered fragments
+
+      Stencil Testing:
+        decides whether a fragment can be rendered,
+        based on stencil buffer rules
+
+      Blending:
+        combines the fragment shader output
+        with the current framebuffer color
+        (commonly used for transparency)
+
     ↓
 
     Final framebuffer output
