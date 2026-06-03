@@ -5,6 +5,8 @@ project(opengl-intro)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c" "src/**/*.cpp")
+
 include_directories(include)
 
 find_package(OpenGL REQUIRED)
@@ -19,10 +21,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glfw)
 
-add_executable(${PROJECT_NAME}
-  src/glad.c
-  src/main.cpp
-)
+add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   glfw
