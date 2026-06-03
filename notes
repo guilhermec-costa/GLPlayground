@@ -1,0 +1,111 @@
+Shader:
+  program that runs on the GPU during the graphics pipeline.
+
+Graphics Pipeline:
+
+  Vertex Shader:
+    runs once for each vertex of vertices array.
+  ↓
+
+  Primitive Assembly (pre-geometry):
+    groups vertices into primitives specified by the draw call
+    (GL_POINTS, GL_LINES, GL_TRIANGLES, etc.)
+  ↓
+
+  Geometry Shader (optional):
+    runs once for each primitive assembled previously.
+
+    It can:
+    - generate new vertices
+    - discard primitives
+    - define a new primitive interpretation through `layout(... ) out`
+  ↓
+
+  Primitive Assembly (post-geometry / shape assembly):
+    groups vertices emitted by the geometry shader
+    according to the geometry shader output primitive.
+
+    If no geometry shader exists:
+      interprets vertices using the primitive type from the draw call.
+  ↓
+
+  Clipping:
+    discards portions of primitives outside the viewing volume.
+  ↓
+
+  Rasterization:
+    converts primitives into fragments.
+
+    Determines which screen samples/pixels are covered by the primitive.
+
+    Outputs fragments (not pixels yet).
+  ↓
+
+
+  Fragment:
+    contains all data required to shade a potential pixel
+    (interpolated attributes, depth, texture coordinates, etc.)
+  ↓
+
+  Fragment Shader:
+    runs once for each fragment.
+
+    Its purpose is to compute the fragment output
+    (usually color, optionally depth/discard).
+  ↓
+
+    Tests and Blending (Per-fragment operations):
+    Alpha Test / Discard:
+      decides whether a fragment should exist,
+      usually based on its alpha value (transparency threshold)
+
+    Depth Testing:
+      decides whether a fragment is visible,
+      based on its depth compared to previously rendered fragments
+
+    Stencil Testing:
+      decides whether a fragment can be rendered,
+      based on stencil buffer rules
+
+    Blending:
+      combines the fragment shader output
+      with the current framebuffer color
+      (commonly used for transparency)
+
+  ↓
+
+  Final framebuffer output
+
+---
+
+NDC: normalized screen coordinates (cartesian plan)
+SSC: screen-space coordinates (they're the fragments, with real pixel
+positions)
+
+
+---
+
+Mesh:
+vertex/index data that describes the geometry of an object.
+  A mesh defines the shape of something.
+
+VBO (Vertex Buffer Object):
+  GPU buffer that stores vertex data
+  (positions, colors, normals, UVs, etc.).
+  It can be bound to GL_ARRAY_BUFFER.
+
+VAO (Vertex Array Object):
+  Stores how vertex data should be interpreted.
+  It describes vertex attributes, layout, stride,
+  offsets, and which VBO(s) are used.
+  also stores binded EBOs
+
+EBO (Element Buffer Object):
+  An index buffer that stores vertex indices.
+  It defines how vertices are reused and assembled
+  into primitives (e.g., triangles), avoiding
+  duplicated vertex data.
+  It is bound to GL_ELEMENT_ARRAY_BUFFER.
+
+Binding a VAO restores this configuration
+so the mesh can be drawn.

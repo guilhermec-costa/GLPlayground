@@ -1,102 +1,41 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <string>
 
-void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
-  std::cout << "resizing window to w: " << width << " h: " << height << "\n";
-  glViewport(0, 0, width, height);
-};
+/*
+  GLSL
+  vec4: vec.x, vec.y, vec.z and vec.w (perspective division)
+  gl_Position: predefined output variable. It is the output of the vertex shader
+*/
+std::string vertexShaderSource = R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
 
-void processInput(GLFWwindow *window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
-  }
+void main() {
+  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
 }
+)";
+
+std::string fragmentShaderSource = R"(# 
+#version 330 core
+out vec4 FragColor;
+
+void main(){
+  FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+}
+)";
+
+void framebufferResizeCallback(GLFWwindow *window, int width, int height);
+void processInput(GLFWwindow *window);
+int checkShaderCompilation(unsigned int shaderId);
+int checkProgramLinkingStatus(unsigned int programId);
 
 const unsigned int WINDOW_WIDTH = 800;
 const unsigned int WINDOW_HEIGHT = 600;
 
-/*
-  Shader:
-    program that runs on the GPU during the graphics pipeline.
-
-  Graphics Pipeline:
-
-    Vertex Shader:
-      runs once for each vertex.
-    ↓
-
-    Primitive Assembly (pre-geometry):
-      groups vertices into primitives specified by the draw call
-      (GL_POINTS, GL_LINES, GL_TRIANGLES, etc.)
-    ↓
-
-    Geometry Shader (optional):
-      runs once for each primitive assembled previously.
-
-      It can:
-      - generate new vertices
-      - discard primitives
-      - define a new primitive interpretation through `layout(... ) out`
-    ↓
-
-    Primitive Assembly (post-geometry / shape assembly):
-      groups vertices emitted by the geometry shader
-      according to the geometry shader output primitive.
-
-      If no geometry shader exists:
-        interprets vertices using the primitive type from the draw call.
-    ↓
-
-    Clipping:
-      discards portions of primitives outside the viewing volume.
-    ↓
-
-    Rasterization:
-      converts primitives into fragments.
-
-      Determines which screen samples/pixels are covered by the primitive.
-
-      Outputs fragments (not pixels yet).
-    ↓
-
-
-    Fragment:
-      contains all data required to shade a potential pixel
-      (interpolated attributes, depth, texture coordinates, etc.)
-    ↓
-
-    Fragment Shader:
-      runs once for each fragment.
-
-      Its purpose is to compute the fragment output
-      (usually color, optionally depth/discard).
-    ↓
-
-     Tests and Blending (Per-fragment operations):
-      Alpha Test / Discard:
-        decides whether a fragment should exist,
-        usually based on its alpha value (transparency threshold)
-
-      Depth Testing:
-        decides whether a fragment is visible,
-        based on its depth compared to previously rendered fragments
-
-      Stencil Testing:
-        decides whether a fragment can be rendered,
-        based on stencil buffer rules
-
-      Blending:
-        combines the fragment shader output
-        with the current framebuffer color
-        (commonly used for transparency)
-
-    ↓
-
-    Final framebuffer output
-*/
-
 int main() {
+
   if (glfwInit() == GLFW_FALSE) {
     std::cout << "failed to initialize GLFW\n";
     return -1;
@@ -124,24 +63,130 @@ int main() {
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
   glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 
-  // list of 3D coordinates
+  unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+  const char *vss = vertexShaderSource.c_str();
+  glShaderSource(vertexShader, 1, &vss, NULL);
+  glCompileShader(vertexShader);
+
+  if (checkShaderCompilation(vertexShader) == -1) {
+    return -1;
+  }
+
+  unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+  const char *fss = fragmentShaderSource.c_str();
+  glShaderSource(fragmentShader, 1, &fss, NULL);
+  glCompileShader(fragmentShader);
+
+  if (checkShaderCompilation(fragmentShader) == -1) {
+    return -1;
+  }
+
+  unsigned int shaderProgram = glCreateProgram();
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+  glLinkProgram(shaderProgram);
+
+  if (checkProgramLinkingStatus(shaderProgram) == -1) {
+    return -1;
+  }
+
+  glUseProgram(shaderProgram);
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
   float vertices[] = {
-      -0.5, -0.5f, 0.0f, // vertex
-      0.5,  -0.5f, 0.0f  // vertex
+      0.5f,  0.5f,  0.0f, // top right vertex (0)
+      0.5f,  -0.5f, 0.0f, // bottom right (1)
+      -0.5f, -0.5f, 0.0f, // bottom left (2)
+      -0.5f, 0.5f,  0.0f  // top left (3)
   };
 
+  unsigned int indices[] = {0, 1, 3, 1, 2, 3}; // vertex indices
+
+  unsigned int VAO, VBO, EBO;
+
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
+
+  glBindVertexArray(VAO);
+
+  // GL_ARRAY_BUFFER is the buffer type for a vertex buffer object (VBO)
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+               GL_STATIC_DRAW);
+
+  glBindVertexArray(0);
   while (!glfwWindowShouldClose(window)) {
     // frame start
     processInput(window);
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO);
+    // glDrawArrays(GL_TRIANGLES, 0, 5);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
     // frame end
   }
 
+  glDeleteVertexArrays(1, &VAO);
+  glDeleteBuffers(1, &VBO);
+  glDeleteBuffers(1, &EBO);
+  glDeleteProgram(shaderProgram);
+
   glfwTerminate();
+  return 0;
+}
+
+void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
+  std::cout << "resizing window to w: " << width << " h: " << height << "\n";
+  glViewport(0, 0, width, height);
+};
+
+void processInput(GLFWwindow *window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, true);
+  }
+}
+
+int checkShaderCompilation(unsigned int shader) {
+  int success;
+  char infoLog[512];
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(shader, sizeof(infoLog), NULL, infoLog);
+    std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
+
+    return -1;
+  }
+
+  return 0;
+}
+
+int checkProgramLinkingStatus(unsigned int programId) {
+  int success;
+  char infoLog[512];
+  glGetProgramiv(programId, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(programId, sizeof(infoLog), NULL, infoLog);
+    std::cout << "ERROR::PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
+    return -1;
+  }
   return 0;
 }
