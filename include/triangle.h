@@ -30,9 +30,8 @@ public:
 
   void draw() {
     this->bind();
-    this->bindShader();
+    this->bindShaderProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
-    std::cout << "error: " << glGetError() << "\n";
   }
 
   void make() {
@@ -50,7 +49,7 @@ public:
 
   void bind() { glBindVertexArray(this->VAO); }
 
-  void bindShader() { glUseProgram(this->program); }
+  void bindShaderProgram() { glUseProgram(this->program); }
 
   ~Triangle() {
     glDeleteBuffers(1, &this->VBO);

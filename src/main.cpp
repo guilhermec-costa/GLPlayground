@@ -9,6 +9,7 @@ static void processInput(GLFWwindow* window);
 void helloTriangle(GLFWwindow* window, std::optional<InputProcessor>);
 void trianglePlayground(GLFWwindow* window, std::optional<InputProcessor>);
 void triangleVBOS(GLFWwindow* window, std::optional<InputProcessor>);
+void shaderPractice(GLFWwindow* window, std::optional<InputProcessor> inputProcessor);
 
 void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
@@ -43,9 +44,13 @@ int main() {
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
   glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 
+  int nrAttrib;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttrib);
+  std::cout << "Maximum nr of vertex attributes supported: " << nrAttrib << std::endl;
   // helloTriangle(window);
   // trianglePlayground(window, processInput);
-  triangleVBOS(window, processInput);
+  // triangleVBOS(window, processInput);
+  shaderPractice(window, processInput);
 
   glfwTerminate();
   return 0;

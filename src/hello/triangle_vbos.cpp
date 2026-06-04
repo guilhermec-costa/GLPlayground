@@ -75,7 +75,7 @@ void triangleVBOS(GLFWwindow* window, std::optional<InputProcessor> inputProcess
       inputProcessor.value()(window);
     }
 
-    glClearColor(0.2470f, 0.1333f, 0.0588f, 1.0);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     for (auto& t : triangles) {
