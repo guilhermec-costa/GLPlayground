@@ -1,9 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "gl-utils.h"
+#include "gl_utils.h"
 #include <string>
-
-void processInput(GLFWwindow *window);
+#include <optional>
 
 /*
   GLSL
@@ -28,7 +27,7 @@ void main(){
 }
 )";
 
-void helloTriangle(GLFWwindow* window) {
+void helloTriangle(GLFWwindow* window, std::optional<InputProcessor> inputProcessor) {
   unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
   const char *vss = vertexShaderSource.c_str();
@@ -96,7 +95,9 @@ void helloTriangle(GLFWwindow* window) {
 
   while (!glfwWindowShouldClose(window)) {
     // frame start
-    processInput(window);
+    if(inputProcessor.has_value()) {
+      inputProcessor.value()(window);
+    }
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -116,9 +117,3 @@ void helloTriangle(GLFWwindow* window) {
   glDeleteBuffers(1, &EBO);
   glDeleteProgram(shaderProgram);
 };
-
-void processInput(GLFWwindow *window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
-  }
-}

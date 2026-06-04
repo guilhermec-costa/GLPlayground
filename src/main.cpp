@@ -1,10 +1,16 @@
 #include <glad/glad.h>
+#include "gl_utils.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <optional>
 
-void helloTriangle(GLFWwindow* window);
-void trianglePlayground(GLFWwindow* window);
-void framebufferResizeCallback(GLFWwindow *window, int width, int height);
+static void processInput(GLFWwindow* window);
+
+void helloTriangle(GLFWwindow* window, std::optional<InputProcessor>);
+void trianglePlayground(GLFWwindow* window, std::optional<InputProcessor>);
+void triangleVBOS(GLFWwindow* window, std::optional<InputProcessor>);
+
+void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 const unsigned int WINDOW_WIDTH = 800;
 const unsigned int WINDOW_HEIGHT = 600;
@@ -20,8 +26,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWwindow *window =
-      glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGLIntro", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGLIntro", NULL, NULL);
   if (!window) {
     std::cout << "Failed to create GLFW window\n";
     glfwTerminate();
@@ -39,13 +44,20 @@ int main() {
   glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 
   // helloTriangle(window);
-  trianglePlayground(window);
+  // trianglePlayground(window, processInput);
+  triangleVBOS(window, processInput);
 
   glfwTerminate();
   return 0;
 }
 
-void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
+void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
   std::cout << "resizing window to w: " << width << " h: " << height << "\n";
   glViewport(0, 0, width, height);
+}
+
+static void processInput(GLFWwindow* window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, true);
+  }
 };
