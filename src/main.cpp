@@ -3,6 +3,7 @@
 #include <iostream>
 
 void helloTriangle(GLFWwindow* window);
+void trianglePlayground(GLFWwindow* window);
 void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 
 const unsigned int WINDOW_WIDTH = 800;
@@ -37,7 +38,8 @@ int main() {
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
   glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 
-  helloTriangle(window);
+  // helloTriangle(window);
+  trianglePlayground(window);
 
   glfwTerminate();
   return 0;
