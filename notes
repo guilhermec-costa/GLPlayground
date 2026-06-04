@@ -100,6 +100,11 @@ VAO (Vertex Array Object):
   offsets, and which VBO(s) are used.
   also stores binded EBOs
 
+  A vertex array object stores the following:
+    - Calls to glEnableVertexAttribArray or glDisableVertexAttribArray.
+    - Vertex attribute configurations via glVertexAttribPointer.
+    - Vertex buffer objects associated with vertex attributes by calls to glVertexAttribPointer.
+
 EBO (Element Buffer Object):
   An index buffer that stores vertex indices.
   It defines how vertices are reused and assembled
