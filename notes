@@ -125,3 +125,27 @@ Shaders:
 
 - Uniforms are another way to pass data from our application on the CPU to the shaders on the GPU
 - Uniforms are global. Global, meaning that a uniform variable is unique per shader program object, and can be accessed from any shader at any stage in the shader program
+
+
+Rasterizer
+- The rasterizer determines which fragments are generated from the primitive
+  (e.g., triangle) and their screen-space positions.
+
+- Fragment interpolation:
+  the rasterizer interpolates all fragment shader input variables that originate
+  from vertex shader output variables (`out -> in` matching).
+
+  The interpolation is based on the fragment position.
+
+  For each fragment, the rasterizer computes interpolation weights relative to
+  the vertices that originated it and uses those weights to compute
+  the fragment attribute values.
+
+  Conceptually:
+
+  fragmentAttribute =
+      w1 * vertexAttribute1 +
+      w2 * vertexAttribute2 +
+      w3 * vertexAttribute3
+
+  where the weights depend on the fragment position within the primitive.

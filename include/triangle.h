@@ -2,7 +2,6 @@
 
 #include "glad/glad.h"
 #include <cstddef>
-#include <iostream>
 
 class Triangle {
 
