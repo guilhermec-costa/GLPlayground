@@ -56,7 +56,7 @@ void uniforms(GLFWwindow *window,
 
     glBindVertexArray(VAO);
     shader.use();
-    offset += 0.0005f;
+    offset += 0.0000f;
     shader.setUniformFloat("offset", offset);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);

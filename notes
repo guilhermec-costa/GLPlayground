@@ -149,3 +149,9 @@ Rasterizer
       w3 * vertexAttribute3
 
   where the weights depend on the fragment position within the primitive.
+
+
+Textures:
+- Each vertex should thus have a texture coordinate associated with them that specifies what part of the texture image to sample from
+- Retrieving the texture color using texture coordinates is called sampling.
+- UV = texture coordinate

@@ -12,6 +12,8 @@ void triangleVBOS(GLFWwindow *window, std::optional<InputProcessor>);
 void uniforms(GLFWwindow *window, std::optional<InputProcessor> inputProcessor);
 void interpolation(GLFWwindow *window,
                    std::optional<InputProcessor> inputProcessor);
+void texturePlayground(GLFWwindow *window,std::optional<InputProcessor> inputProcessor);
+void pinkFloyd(GLFWwindow *window,std::optional<InputProcessor> inputProcessor);
 
 void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 
@@ -54,8 +56,10 @@ int main() {
   // helloTriangle(window);
   // trianglePlayground(window, processInput);
   // triangleVBOS(window, processInput);
-  uniforms(window, processInput);
+  // uniforms(window, processInput);
   // interpolation(window, processInput);
+  //texturePlayground(window, processInput);
+  pinkFloyd(window, processInput);
 
   glfwTerminate();
   return 0;
