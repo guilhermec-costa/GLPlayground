@@ -54,10 +54,6 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     throw std::runtime_error("failed to compile fragment shader");
   };
 
-  std::cout << "Shaders code:\n";
-  std::cout << "Vertex: \n" << vertexShaderCode << "\n";
-  std::cout << "Fragment: \n" << vertexShaderCode << "\n";
-
   ID = glCreateProgram();
   glAttachShader(ID, vertexShader);
   glAttachShader(ID, fragmentShader);

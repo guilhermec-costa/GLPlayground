@@ -55,11 +55,11 @@ int main() {
             << std::endl;
   // helloTriangle(window);
   // trianglePlayground(window, processInput);
-  // triangleVBOS(window, processInput);
+  triangleVBOS(window, processInput);
   // uniforms(window, processInput);
   // interpolation(window, processInput);
   //texturePlayground(window, processInput);
-  pinkFloyd(window, processInput);
+  // pinkFloyd(window, processInput);
 
   glfwTerminate();
   return 0;
