@@ -30,6 +30,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 
   GLFWwindow *window =
       glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGLIntro", NULL, NULL);
@@ -55,11 +56,11 @@ int main() {
             << std::endl;
   // helloTriangle(window);
   // trianglePlayground(window, processInput);
-  triangleVBOS(window, processInput);
+  // triangleVBOS(window, processInput);
   // uniforms(window, processInput);
   // interpolation(window, processInput);
-  //texturePlayground(window, processInput);
   // pinkFloyd(window, processInput);
+  texturePlayground(window, processInput);
 
   glfwTerminate();
   return 0;
