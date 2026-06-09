@@ -9,9 +9,11 @@
 
 void texturePlayground(GLFWwindow *window,
                        std::optional<InputProcessor> inputProcessor) {
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture); 
+  auto staticPath = std::filesystem::path(PROJECT_ROOT) / "static";
+
+  unsigned int woodTexture;
+  glGenTextures(1, &woodTexture);
+  glBindTexture(GL_TEXTURE_2D, woodTexture); 
 
   // texture type, axis, wrap mode 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
@@ -22,7 +24,6 @@ void texturePlayground(GLFWwindow *window,
   // magnifying = less distance from the texture
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  auto staticPath = std::filesystem::path(PROJECT_ROOT) / "static";
   auto texturePath = staticPath/"wood.jpg";
 
   std::cout << "Loading texture from path " << texturePath.string() << "\n";
@@ -43,6 +44,44 @@ void texturePlayground(GLFWwindow *window,
     std::cout << "failed to load texture\n";
   }
   stbi_image_free(data);
+
+  // -------------------------------------------------------
+   unsigned int happyFaceTexture;
+  glGenTextures(1, &happyFaceTexture);
+  glBindTexture(GL_TEXTURE_2D, happyFaceTexture); 
+
+  // texture type, axis, wrap mode 
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+  // minifying = more distance from the texture
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  // magnifying = less distance from the texture
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  auto happyFaceTexturePath = staticPath/"happyface.png";
+
+  std::cout << "Loading texture from path " << happyFaceTexturePath.string() << "\n";
+  int happyFaceWidth, happyFaceHeight, happyFaceNrChannels;
+
+  stbi_set_flip_vertically_on_load(true);
+  unsigned char *happyFaceData = stbi_load(happyFaceTexturePath.c_str(), &happyFaceWidth, &happyFaceHeight, &happyFaceNrChannels, 0);
+
+
+  if(happyFaceData) {
+    std::cout << "Texture loaded from " << texturePath.string() << "\n";
+    // generate a texture image to the current bound texture object
+    glTexImage2D(GL_TEXTURE_2D, /* mipmap level */ 0, 
+      /* destination color format*/ GL_RGB, happyFaceWidth, happyFaceHeight, 0, 
+      /* source color format*/ GL_RGBA, 
+      /* source data format */ GL_UNSIGNED_BYTE, 
+      happyFaceData);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    std::cout << "failed to load texture\n";
+  }
+  stbi_image_free(happyFaceData);
+
 
   float vertexData[] = {
     // positions        // colors           // uv
@@ -82,15 +121,27 @@ void texturePlayground(GLFWwindow *window,
   auto shaderDir = std::filesystem::path(PROJECT_ROOT) / "src" / "textures";
   Shader shader((shaderDir / "vertex.glsl").c_str(),
                 (shaderDir / "frag.glsl").c_str());
+  
+
+  shader.use();
+  // sets the texture unit with the bound texture
+  shader.setUniformInt("woodWall", 0);
+  shader.setUniformInt("happyFace", 1);
+
   while (!glfwWindowShouldClose(window)) {
     if (inputProcessor.has_value()) {
       inputProcessor.value()(window);
     }
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.42f, 0.33f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, woodTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, happyFaceTexture);
+
     shader.use();
 
-    glBindTexture(GL_TEXTURE_2D, texture);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

@@ -20,6 +20,8 @@ void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 const unsigned int WINDOW_WIDTH = 800;
 const unsigned int WINDOW_HEIGHT = 600;
 
+void fn(int&& x) {}
+
 int main() {
 
   if (glfwInit() == GLFW_FALSE) {
