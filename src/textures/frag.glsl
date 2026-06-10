@@ -13,5 +13,19 @@ uniform sampler2D happyFace;
 void main() {
   // texture(sampler argument, uv argument): outputs the texel color (VEC4)
   // FragColor = texture(woodWall) * vec4(Color, 1.0);  // mix colors
-  FragColor = mix(texture(woodWall, Uv),texture(happyFace, Uv),0.3);
+
+  // this inverts the uv in the Y axis
+  vec2 invertedUv = vec2(Uv.x, 1.0 - Uv.y); 
+
+  /*e.g pre wrapper
+    1.0 - 0.8 = 0.2
+    1.0 - 2.1 = -1.1
+  */
+
+  /*e.g post wrapper
+    fract(0.2) = 0.2 - floor(0.2) -> 0.2 - 0
+    fract(-1.1) = -1.1 - floor(-1.1) -> -1.1 - (-2) = -1.1 + 2 = 0.9
+  */
+
+  FragColor = mix(texture(woodWall, Uv),texture(happyFace, invertedUv),0.3);
 }

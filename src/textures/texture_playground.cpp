@@ -16,8 +16,8 @@ void texturePlayground(GLFWwindow *window,
   glBindTexture(GL_TEXTURE_2D, woodTexture); 
 
   // texture type, axis, wrap mode 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   // minifying = more distance from the texture
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -51,8 +51,8 @@ void texturePlayground(GLFWwindow *window,
   glBindTexture(GL_TEXTURE_2D, happyFaceTexture); 
 
   // texture type, axis, wrap mode 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   // minifying = more distance from the texture
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -64,7 +64,8 @@ void texturePlayground(GLFWwindow *window,
   std::cout << "Loading texture from path " << happyFaceTexturePath.string() << "\n";
   int happyFaceWidth, happyFaceHeight, happyFaceNrChannels;
 
-  stbi_set_flip_vertically_on_load(true);
+  // stbi_set_flip_vertically_on_load(true);
+  // stbi_set_flip_vertically_on_load(false);
   unsigned char *happyFaceData = stbi_load(happyFaceTexturePath.c_str(), &happyFaceWidth, &happyFaceHeight, &happyFaceNrChannels, 0);
 
 
@@ -85,10 +86,10 @@ void texturePlayground(GLFWwindow *window,
 
   float vertexData[] = {
     // positions        // colors           // uv
-    0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-    0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+    0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   2.0f, 2.0f, // top right
+    0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   2.0f, 0.0f, // bottom right
     -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f,   0.0f, 1.0f, // top left 
+    -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f,   0.0f, 2.0f, // top left 
   };
 
   unsigned int indices[] = {
@@ -132,7 +133,7 @@ void texturePlayground(GLFWwindow *window,
     if (inputProcessor.has_value()) {
       inputProcessor.value()(window);
     }
-    glClearColor(0.0f, 0.42f, 0.33f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glActiveTexture(GL_TEXTURE0);

@@ -35,3 +35,7 @@ A small OpenGL texture study project focused on:
 - texture wrapping and filtering (`GL_REPEAT`, `GL_MIRRORED_REPEAT`)
 - mipmapping for minification
 - texture sampling using `sampler2D`
+
+---
+
+![woodWallRepeatHappyFace](static/happyface-wood.png)
