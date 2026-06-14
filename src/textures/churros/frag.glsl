@@ -3,8 +3,10 @@
 in vec2 Uv;
 out vec4 FragColor;
 
-uniform sampler2D churrosTex;
+uniform sampler2D happyTex;
+uniform sampler2D woodTex;
+uniform float brightness;
 
 void main() {
-  FragColor = texture(churrosTex, Uv);
+  FragColor = mix(texture(woodTex, Uv), texture(happyTex, Uv), 0.5) * brightness; 
 }

@@ -133,6 +133,7 @@ void texturePlayground(GLFWwindow *window,
     if (inputProcessor.has_value()) {
       inputProcessor.value()(window);
     }
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 

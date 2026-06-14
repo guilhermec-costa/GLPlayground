@@ -5,7 +5,7 @@
 #include <optional>
 
 static void processInput(GLFWwindow *window);
-
+void vectors();
 void helloTriangle(GLFWwindow *window, std::optional<InputProcessor>);
 void trianglePlayground(GLFWwindow *window, std::optional<InputProcessor>);
 void triangleVBOS(GLFWwindow *window, std::optional<InputProcessor>);
@@ -57,6 +57,7 @@ int main() {
   glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttrib);
   std::cout << "Maximum nr of vertex attributes supported: " << nrAttrib
             << std::endl;
+  vectors();
   // helloTriangle(window);
   // trianglePlayground(window, processInput);
   // triangleVBOS(window, processInput);
@@ -64,7 +65,7 @@ int main() {
   // interpolation(window, processInput);
   // pinkFloyd(window, processInput);
   // texturePlayground(window, processInput);
-  churrosTexture(window, processInput);
+  // churrosTexture(window, processInput);
 
   glfwTerminate();
   return 0;

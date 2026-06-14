@@ -159,3 +159,30 @@ Textures:
 - GL_LINEAR (also known as (bi)linear filtering) takes an interpolated value from the texture coordinate's neighboring texels, approximating a color between the texels
 - Mipmaps: it is basically a collection of texture images where each subsequent texture is twice as small compared to the previous one. Resolves the issue with rendering high resolution textures in objects with a few fragments (distant objects)
 - On fragment shader, GLSL's built-in mix function takes two values as input and linearly interpolates between them based on its third argument. If the third value is 0.0 it returns the first input; if it's 1.0 it returns the second input value. A value of 0.2 will return 80% of the first input color and 20% of the second input color, resulting in a mixture of both our textures.
+
+
+
+Vectors
+- vectors are directions and nothing more. A vector has a direction and a magnitude (also known as its strength or length).
+- Since vectors represent directions, the origin of the vector does not change its value. 
+- to retrieve the length/magnitude of a vector we use the Pythagoras theorem 
+
+Dot product
+- The dot product of two vectors is equal to the scalar product of their lengths times the cosine of the angle between them. 
+- the dot product only defines the angle between both vectors. 
+
+Cross product
+- The cross product is only defined in 3D space and takes two non-parallel vectors as input and produces a third vector that is orthogonal to both the input vectors. If both the input vectors are orthogonal to each other as well, a cross product would result in 3 orthogonal vectors; 
+
+---
+
+Matrix-matrix multiplication
+
+- You can only multiply two matrices if the number of columns on the left-hand side matrix is equal to the number of rows on the right-hand side matrix.
+- Matrix multiplication is not commutative that is A⋅B≠B⋅A
+- a vector is basically a Nx1 matrix where N is the vector's number of components (also known as an N-dimensional vector)
+- if we have a MxN matrix we can multiply this matrix with our Nx1 vector
+- Identity Matrix: is an NxN matrix with only 0s except on its diagonal
+
+Scaling
+-  scaling a vector is increasing the length of the arrow by the amount we'd like to scale, keeping its direction the same

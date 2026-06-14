@@ -5,7 +5,10 @@ layout (location = 1) in vec2 uv;
 
 out vec2 Uv;
 
+uniform float offset;
+uniform float yOffset;
+
 void main() {
-  gl_Position = vec4(position, 1.0);
+  gl_Position = vec4(position.x + offset, position.y + yOffset, position.z, 1.0);
   Uv = uv;
 }
