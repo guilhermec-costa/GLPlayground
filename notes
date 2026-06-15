@@ -182,7 +182,27 @@ Matrix-matrix multiplication
 - Matrix multiplication is not commutative that is A⋅B≠B⋅A
 - a vector is basically a Nx1 matrix where N is the vector's number of components (also known as an N-dimensional vector)
 - if we have a MxN matrix we can multiply this matrix with our Nx1 vector
-- Identity Matrix: is an NxN matrix with only 0s except on its diagonal
+- Identity Matrix: is an NxN matrix with only 0s except for ones along its main diagonal
 
 Scaling
 -  scaling a vector is increasing the length of the arrow by the amount we'd like to scale, keeping its direction the same
+- non-uniform scale, because the scaling factor is not the same for each axis
+- If the scalar would be equal on all axes it would be called a uniform scale
+- scaling matrix can be used to scale vectors, since each diagonal component scales the correspondent vector component. A scaling matrix is a diagonal
+
+Translation
+- uses a translation matrix
+- works because all of the translation values are multiplied by the vector's w column and added to the vector's original values
+- needs a 4-component vector to work (x, y, z, w)
+- Homogeneous coordinates
+  The w component of a vector is also known as a homogeneous coordinate. To get the 3D vector from a homogeneous vector we divide the x, y and z coordinate by its w coordinate. We usually do not notice this since the w component is 1.0 most of the time. Using homogeneous coordinates has several advantages: it allows us to do matrix translations on 3D vectors (without a w component we can't translate vectors)
+
+  Also, whenever the homogeneous coordinate is equal to 0, the vector is specifically known as a direction vector since a vector with a w coordinate of 0 cannot be translated.
+
+Transformation matrices
+- identity matrix
+- scaling matrix (scales vector)
+- translation matrix (moves/translates vector)
+- rotation matrix
+
+- we first do a translation and then a scale transformation when multiplying matrices. Matrix multiplication is not commutative, which means their order is important

@@ -5,6 +5,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <filesystem>
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
   std::cout << std::filesystem::current_path() << '\n';
@@ -79,4 +81,9 @@ void Shader::setUniformFloat(const std::string &name, float value) {
 
 void Shader::setUniformInt(const std::string &name, int value) {
   glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void Shader::setUniformMatrix4fv(const std::string &name, float* mat) {
+  int matLoc = glGetUniformLocation(ID, name.c_str());
+  glUniformMatrix4fv(matLoc, 1, GL_FALSE, mat);
 }

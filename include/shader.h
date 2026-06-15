@@ -13,4 +13,5 @@ public:
   void setUniformBool(const std::string& name, bool value);
   void setUniformInt(const std::string& name, int value);
   void setUniformFloat(const std::string& name, float value);
+  void setUniformMatrix4fv(const std::string &name, float* mat);
 };

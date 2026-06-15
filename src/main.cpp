@@ -17,6 +17,7 @@ void pinkFloyd(GLFWwindow *window,std::optional<InputProcessor> inputProcessor);
 
 void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 void churrosTexture(GLFWwindow* window, std::optional<InputProcessor> inputProcessor);
+void transformations(GLFWwindow* window);
 
 const unsigned int WINDOW_WIDTH = 800;
 const unsigned int WINDOW_HEIGHT = 600;
@@ -66,6 +67,7 @@ int main() {
   // pinkFloyd(window, processInput);
   // texturePlayground(window, processInput);
   // churrosTexture(window, processInput);
+  transformations(window);
 
   glfwTerminate();
   return 0;
