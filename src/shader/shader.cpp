@@ -85,5 +85,9 @@ void Shader::setUniformInt(const std::string &name, int value) {
 
 void Shader::setUniformMatrix4fv(const std::string &name, float* mat) {
   int matLoc = glGetUniformLocation(ID, name.c_str());
-  glUniformMatrix4fv(matLoc, 1, GL_FALSE, mat);
+  glUniformMatrix4fv(matLoc, 
+    /* how many matrices */ 1,
+    /* if should transpose */ GL_FALSE, 
+    mat
+  );
 }

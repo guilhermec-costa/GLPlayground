@@ -18,6 +18,7 @@ void pinkFloyd(GLFWwindow *window,std::optional<InputProcessor> inputProcessor);
 void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 void churrosTexture(GLFWwindow* window, std::optional<InputProcessor> inputProcessor);
 void transformations(GLFWwindow* window);
+void transformations_review(GLFWwindow* window, std::optional<InputProcessor> inputProcessor);
 
 const unsigned int WINDOW_WIDTH = 800;
 const unsigned int WINDOW_HEIGHT = 600;
@@ -58,8 +59,8 @@ int main() {
   glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttrib);
   std::cout << "Maximum nr of vertex attributes supported: " << nrAttrib
             << std::endl;
-  vectors();
-  // helloTriangle(window);
+  // vectors();
+  // helloTriangle(window, processInput);
   // trianglePlayground(window, processInput);
   // triangleVBOS(window, processInput);
   // uniforms(window, processInput);
@@ -67,7 +68,8 @@ int main() {
   // pinkFloyd(window, processInput);
   // texturePlayground(window, processInput);
   // churrosTexture(window, processInput);
-  transformations(window);
+  //transformations(window);
+  transformations_review(window, processInput);
 
   glfwTerminate();
   return 0;
