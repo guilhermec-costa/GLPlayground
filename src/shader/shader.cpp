@@ -5,6 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <filesystem>
+#include "glm/ext/vector_float3.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -83,11 +84,11 @@ void Shader::setUniformInt(const std::string &name, int value) {
   glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Shader::setUniformMatrix4fv(const std::string &name, float* mat) {
+void Shader::setUniformVec3f(const std::string &name, glm::vec3 v) {
+  int vecLoc = glGetUniformLocation(ID, name.c_str());
+  glUniform3f(vecLoc, v.x, v.y, v.z);
+}
+void Shader::setUniformMat4fv(const std::string &name, float* mat) {
   int matLoc = glGetUniformLocation(ID, name.c_str());
-  glUniformMatrix4fv(matLoc, 
-    /* how many matrices */ 1,
-    /* if should transpose */ GL_FALSE, 
-    mat
-  );
+  glUniformMatrix4fv(matLoc, 1, GL_FALSE, mat);
 }

@@ -1,40 +1,15 @@
 #include "gl_utils.h"
+#include "glm/ext/matrix_float4x4.hpp"
 #include "shader.h"
+#include "texture_utils.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <filesystem>
 #include <optional>
+#include <filesystem>
 #include <stb_image.h>
-
-void load_texture(uint* texId, const char* texpath, int internalformat, int pixelformat) {
-  glGenTextures(1, texId);
-  glBindTexture(GL_TEXTURE_2D, *texId);
-
-  int w, h, nrch;
-  unsigned char *texData = stbi_load(texpath, &w, &h, &nrch, 0);
-  if(texData) {
-    glTexImage2D(
-      GL_TEXTURE_2D, 
-      0, 
-      internalformat, 
-      w, h, 0, 
-      pixelformat, 
-      GL_UNSIGNED_BYTE, 
-      texData
-    );
-    stbi_image_free(texData);
-  }
-  glGenerateMipmap(GL_TEXTURE_2D);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
-
-void bind_to_active_texture(short texIndex, uint texId) {
-  glActiveTexture(GL_TEXTURE0 + texIndex);
-  glBindTexture(GL_TEXTURE_2D, texId);
-}
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void transformations_review(GLFWwindow *window, std::optional<InputProcessor> inputProcessor) {
   // texture config
@@ -84,6 +59,9 @@ void transformations_review(GLFWwindow *window, std::optional<InputProcessor> in
   shader.setUniformInt("TEXTURE1", 0);
   shader.setUniformInt("TEXTURE2", 1);
 
+
+  glm::mat4 trans_mat;
+
   while(!glfwWindowShouldClose(window)) {
     if(inputProcessor.has_value()) {
       inputProcessor.value()(window);
@@ -93,9 +71,14 @@ void transformations_review(GLFWwindow *window, std::optional<InputProcessor> in
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader.use();
+    trans_mat = glm::mat4(1.0f);
+    // trans_mat = glm::translate(trans_mat, glm::vec3(0.1f, -0.4f, 0.0f));
+    trans_mat = glm::rotate(trans_mat, (float)glfwGetTime() * 0.9f, glm::vec3(0.0, 0.0, 1.0));
+    trans_mat = glm::scale(trans_mat, glm::vec3(0.5, 0.5, 0.5));
 
     bind_to_active_texture(0, woodTexId);
     bind_to_active_texture(1, happyfaceTexId);
+    shader.setUniformMat4fv("transform", glm::value_ptr(trans_mat));
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

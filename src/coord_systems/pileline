@@ -1,0 +1,63 @@
+[VERTEX SHADER]
+
+1. LOCAL SPACE
+        ↓  × Model Matrix
+        ↓     REGRA DO w (vale também pra View):
+        ↓     o w do VETOR é o interruptor da translação;
+        ↓     a 4ª COLUNA da matriz é o conteúdo que ele liga/desliga.
+        ↓
+        ↓     | Matriz | 4ª coluna     | w = 1 (ponto)   | w = 0 (direção) |
+        ↓     |--------|---------------|-----------------|-----------------|
+        ↓     | S, R   | (0, 0, 0, 1)  | nada a somar    | nada a somar    |
+        ↓     | T      | (tx, ty, tz,1)| soma constante  | desligado, nada |
+        ↓
+        ↓     x' = r11·x + r12·y + r13·z + tx·w
+        ↓     em S e R o w não afeta x', y', z' e passa intacto (w' = w);
+        ↓     só em T ele multiplica a constante.
+        ↓     (por isso uma única matriz model = T·R·S serve pra pontos
+        ↓      e direções: a parte de T some sozinha quando w = 0)
+2. WORLD SPACE
+        ↓  × View Matrix  (mesma regra: translação inversa da câmera
+        ↓                  só age em pontos, w = 1)
+3. VIEW SPACE
+        ↓  × Projection Matrix
+        ↓     (quarta linha da matriz calcula o w_clip:
+        ↓      w_clip = M41·x + M42·y + M43·z + M44·w_in)
+        ↓     AQUI o papel do w MUDA: deixa de ser interruptor
+        ↓     e passa a carregar a profundidade.
+        ↓
+        ↓     PERSPECTIVA: quarta linha (0, 0, -1, 0)
+        ↓        → w_clip = 0·x + 0·y + (-1)·z + 0·w_in = -z_view
+        ↓        → w carrega a profundidade
+        ↓        → volume de visão = frustum (tronco de pirâmide)
+        ↓     ORTOGRÁFICA: quarta linha (0, 0, 0, 1)
+        ↓        → w_clip = 0·x + 0·y + 0·z + 1·w_in = w_in = 1
+        ↓        → profundidade NÃO entra em w
+        ↓        → volume de visão = caixa (paralelepípedo)
+        ↓        → a matriz já faz o remapeamento linear para [-1, 1]
+4. CLIP SPACE
+        ↓     PERSPECTIVA: -w_clip ≤ x,y,z ≤ w_clip, com w_clip = -z_view
+        ↓     ORTOGRÁFICA: -1 ≤ x,y,z ≤ 1 (o mesmo teste, mas w_clip = 1)
+        ↓
+[CLIPPING]  (testa os vértices, mas decide sobre a PRIMITIVA:
+        ↓    fora por completo → descarta; cruzando → recorta)
+        ↓
+[PERSPECTIVE DIVISION]  (o hardware SEMPRE divide)
+        ↓     NDC = (x_clip / w_clip, y_clip / w_clip, z_clip / w_clip)
+        ↓     PERSPECTIVA: w_clip = -z_view
+        ↓        → x_ndc = x_clip / (-z_view): objetos longe encolhem
+        ↓     ORTOGRÁFICA: w_clip = 1
+        ↓        → x_ndc = x_clip / 1 = x_clip: identidade
+        ↓          (tamanho na tela independe da distância)
+5. NDC (-1.0 a 1.0)
+        ↓     PERSPECTIVA: z_ndc não linear (hiperbólico), precisão
+        ↓                  do depth buffer concentrada perto da câmera
+        ↓     ORTOGRÁFICA: z_ndc linear, precisão uniforme
+        ↓  Viewport Transform
+6. SCREEN SPACE
+        ↓
+[RASTERIZAÇÃO, FRAGMENT SHADER, TESTES FINAIS]  (idênticos)
+        ↓     Detalhe: na ortográfica a interpolação de variáveis
+        ↓     (ex: UV) não precisa de correção de perspectiva,
+        ↓     pois w_clip é constante; na perspectiva ela é
+        ↓     necessária, usando 1/w_clip guardado após a divisão.
