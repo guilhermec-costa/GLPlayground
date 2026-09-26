@@ -10,6 +10,16 @@
 #include <filesystem>
 #include <random>
 
+static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
+bool is_pressed(GLFWwindow* w, int key) {
+  if(glfwGetKey(w, key) == GLFW_PRESS) {
+    return true;
+  }
+  return false;
+}
+
 glm::vec3 get_rand_norm_vec3(
   std::mt19937& gen, 
   std::uniform_real_distribution<float> dist
@@ -18,7 +28,17 @@ glm::vec3 get_rand_norm_vec3(
   return glm::normalize(vec);
 }
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+float lastX = 400, lastY = 300;
+float yaw = -90.f, pitch = 0.0f;
+float fov = 45.0f;
+bool firstMouse = true;
+
+
 void coordinate_system(GLFWwindow* window, std::optional<InputProcessor> inputProcessor) {
+
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<float> dist(0.0f, 1.0f);
@@ -147,46 +167,113 @@ void coordinate_system(GLFWwindow* window, std::optional<InputProcessor> inputPr
 
   glm::mat4 model_mat;
 
-  glm::mat4 view_mat = glm::mat4(1.0f);
-  view_mat = glm::translate(view_mat, glm::vec3(0.0f, 0.0f, -2.0f));
-
-  glm::mat4 proj_mat = glm::mat4(1.0);
-  proj_mat = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
   glEnable(GL_DEPTH_TEST);
+
+  float deltaTime = 0.0f;
+  float lastFrame = 0.0f;
+
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetCursorPosCallback(window, mouse_callback);
+  glfwSetScrollCallback(window, scroll_callback);
+
   while(!glfwWindowShouldClose(window)) {
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
     if(inputProcessor.has_value()) {
       inputProcessor.value()(window);
     }
+    const float cameraSpeed = 4.0f * deltaTime;
+    if(is_pressed(window, GLFW_KEY_W)) {
+      cameraPos += cameraSpeed * cameraFront;
+    }
+    if(is_pressed(window, GLFW_KEY_S)) {
+      cameraPos -= cameraSpeed * cameraFront;
+    }
+    if(is_pressed(window, GLFW_KEY_A)) {
+      cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+    if(is_pressed(window, GLFW_KEY_D)) {
+      cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+    if(is_pressed(window, GLFW_KEY_SPACE)) {
+      cameraPos.y += cameraSpeed; 
+    }
+    if(is_pressed(window, GLFW_KEY_LEFT_SHIFT)) {
+      cameraPos.y -= cameraSpeed;
+    }
+    // -------------------------------------------
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.2f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     bind_to_active_texture(0, woodTexId);
     bind_to_active_texture(1, happyfaceTexId);
 
     shader.use();
-    shader.setUniformMat4fv("view", glm::value_ptr(view_mat));
-    shader.setUniformMat4fv("projection", glm::value_ptr(proj_mat));
     shader.setUniformFloat("time", glm::sin((float)glfwGetTime()) + 1.5f);
 
+    const float radius = 20.0f;
+    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    shader.setUniformMat4fv("view", glm::value_ptr(view));
+
+    glm::mat4 proj_mat = glm::mat4(1.0);
+    proj_mat = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+    shader.setUniformMat4fv("projection", glm::value_ptr(proj_mat));
 
     glBindVertexArray(VAO);
     for (unsigned int i = 0; i<10; i++) {
       model_mat = glm::mat4(1.0f);
       model_mat = glm::translate(model_mat, cubePositions[i]);
-      model_mat = glm::translate(model_mat, glm::vec3(0.0f, 0.0f, -4.0f));
       float angle = 20.0f * (i + 1);
-      glm::vec3 rot_axis = cubeRotations[i]; 
-      model_mat = glm::rotate(model_mat, (float)(glfwGetTime() * 0.5f) * glm::radians(angle), rot_axis);
       shader.setUniformMat4fv("model", glm::value_ptr(model_mat));
 
-      glm::vec3 color = cubeColors[i];
-      // shader.setUniformVec3f("color", color);
       glDrawArrays(GL_TRIANGLES, 0, 36); // performs a draw call
     }
 
     glfwSwapBuffers(window);
     glfwPollEvents();
+  }
+}
+
+static void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+  if(firstMouse) {
+    lastX = xpos;
+    lastY = ypos;
+    firstMouse = false;
+  }
+
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
+  lastX = xpos;
+  lastY = ypos;
+  
+  const float sensitivity = 0.01f;
+  xoffset *= sensitivity;
+  yoffset *= sensitivity;
+
+  yaw += xoffset;
+  pitch += yoffset;
+
+  if(pitch > 89.0f)
+    pitch = 89.0f;
+  if(pitch < -89.0f)
+    pitch = -89.0f;
+
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+  direction.y = sin(glm::radians(pitch));
+  cameraFront = glm::normalize(direction);
+}
+
+static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+  fov -= (float)yoffset;
+  if(fov < 1.0f) {
+    fov = 1.0f;
+  }
+  if(fov > 45.0f) {
+    fov = 45.0f;
   }
 }
